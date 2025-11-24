@@ -21,7 +21,7 @@
 
 
 // Set these to your desired credentials.
-const char *ssid = "brake_controller";
+const char *ssid = "led_controller";
 const char *password = "87654321";
 
 NetworkServer server(80);
