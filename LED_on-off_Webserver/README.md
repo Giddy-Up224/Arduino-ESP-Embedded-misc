@@ -22,4 +22,4 @@
 
 ## Notes:
 
-I hope you have as much fun using this and modifying it as I did!
+I've had a blast modifying this. Please dive in and have some fun!
