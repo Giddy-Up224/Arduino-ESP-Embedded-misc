@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LED Control</title>
+    <style>
+        body {
+            background-color: #050505;
+            color: white;
+            font-size: 22px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .on {
+            background-color: #0CFF27;
+            color: white;
+        }
+
+        .off {
+            background-color: #FF290D;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LED Control Panel</h1>
+    <p>
+        <span style="color: red; font-weight: bold;">RED LED</span>
+        <button class="on" onclick="location.href='/RO'">ON</button>
+        <button class="off" onclick="location.href='/RF'">OFF</button>
+    </p>
+    <p>
+        <span style="color: green; font-weight: bold;">GREEN LED</span>
+        <button class="on" onclick="location.href='/GO'">ON</button>
+        <button class="off" onclick="location.href='/GF'">OFF</button>
+    </p>
+    <p>
+        <span style="color: blue; font-weight: bold;">BLUE LED</span>
+        <button class="on" onclick="location.href='/BO'">ON</button>
+        <button class="off" onclick="location.href='/BF'">OFF</button>
+    </p>
+</body>
+
+</html>

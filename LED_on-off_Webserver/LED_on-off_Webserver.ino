@@ -77,44 +77,57 @@ void loop() {
             const char htmlResponse[] PROGMEM = R"html(
               <!DOCTYPE html>
               <html>
-                <head>
+
+              <head>
                   <title>LED Control</title>
                   <style>
-                    body { 
-                      background-color: #050505;
-                      color: white;
-                      font-size: 20px;
-                    }
-                    button {
-                      padding: 8px 16px;
-                      margin: 4px;
-                      font-size: 16px;
-                      cursor: pointer;
-                      border: none;
-                      border-radius: 4px;
-                    }
-                    .on { background-color: #0CFF27; color: white; }
-                    .off { background-color: #FF290D; color: white; }
+                      body {
+                          background-color: #050505;
+                          color: white;
+                          font-size: 22px;
+                      }
+
+                      button {
+                          padding: 8px 16px;
+                          margin: 4px;
+                          font-size: 16px;
+                          font-weight: bold;
+                          cursor: pointer;
+                          border: none;
+                          border-radius: 4px;
+                      }
+
+                      .on {
+                          background-color: #0CFF27;
+                          color: white;
+                      }
+
+                      .off {
+                          background-color: #FF290D;
+                          color: white;
+                      }
                   </style>
-                </head>
-                <body>
+              </head>
+
+              <body>
                   <h1>LED Control Panel</h1>
                   <p>
-                    RED LED
-                    <button class="on" onclick="location.href='/RO'">ON</button>
-                    <button class="off" onclick="location.href='/RF'">OFF</button>
+                      <span style="color: red; font-weight: bold;">RED LED</span>
+                      <button class="on" onclick="location.href='/RO'">ON</button>
+                      <button class="off" onclick="location.href='/RF'">OFF</button>
                   </p>
                   <p>
-                    GREEN LED
-                    <button class="on" onclick="location.href='/GO'">ON</button>
-                    <button class="off" onclick="location.href='/GF'">OFF</button>
+                      <span style="color: green; font-weight: bold;">GREEN LED</span>
+                      <button class="on" onclick="location.href='/GO'">ON</button>
+                      <button class="off" onclick="location.href='/GF'">OFF</button>
                   </p>
                   <p>
-                    BLUE LED
-                    <button class="on" onclick="location.href='/BO'">ON</button>
-                    <button class="off" onclick="location.href='/BF'">OFF</button>
+                      <span style="color: blue; font-weight: bold;">BLUE LED</span>
+                      <button class="on" onclick="location.href='/BO'">ON</button>
+                      <button class="off" onclick="location.href='/BF'">OFF</button>
                   </p>
-                </body>
+              </body>
+
               </html>
             )html";
             
@@ -134,22 +147,22 @@ void loop() {
         // Check to see if the client request was "GET /*" or "GET /*":
         // inverted logic for RGB LEDs on CYD
         if (currentLine.endsWith("GET /RF")) {
-          digitalWrite(RED_LED, HIGH);  // GET /RL turns the RED LED off
+          digitalWrite(RED_LED, HIGH);
         }
         if (currentLine.endsWith("GET /RO")) {
-          digitalWrite(RED_LED, LOW);  // GET /RH turns the RED LED on
+          digitalWrite(RED_LED, LOW);
         }
         if (currentLine.endsWith("GET /GF")) {
-          digitalWrite(GREEN_LED, HIGH);  // GET /RH turns the RED LED on
+          digitalWrite(GREEN_LED, HIGH);
         }
         if (currentLine.endsWith("GET /GO")) {
-          digitalWrite(GREEN_LED, LOW);  // GET /RH turns the RED LED on
+          digitalWrite(GREEN_LED, LOW);
         }
         if (currentLine.endsWith("GET /BF")) {
-          digitalWrite(BLUE_LED, HIGH);  // GET /RH turns the RED LED on
+          digitalWrite(BLUE_LED, HIGH);
         }
         if (currentLine.endsWith("GET /BO")) {
-          digitalWrite(BLUE_LED, LOW);  // GET /RH turns the RED LED on
+          digitalWrite(BLUE_LED, LOW);
         }
       }
     }
