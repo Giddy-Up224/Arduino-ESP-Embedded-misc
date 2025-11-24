@@ -7,7 +7,7 @@
 
 ## Compile and Upload
 
-* If you don't already have ESP32 support installed please do so. You can fllow this tutorial: [ESP32 in Arduino IDE](https://lastminuteengineers.com/esp32-arduino-ide-tutorial/)
+* If you don't already have ESP32 support installed please do so. You can follow this tutorial: [ESP32 in Arduino IDE](https://lastminuteengineers.com/esp32-arduino-ide-tutorial/)
 * Compile and upload the project using Arduino IDE (you will need to have your board and port selected. I recommend setting the Upload speed to 921600 for faster uploads: `Tools>Upload Speed>921600`)
 
 ## Connect
