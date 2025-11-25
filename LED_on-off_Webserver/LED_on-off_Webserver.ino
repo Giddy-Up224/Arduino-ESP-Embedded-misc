@@ -46,7 +46,8 @@ void setup() {
   // a valid password must have more than 7 characters
   if (!WiFi.softAP(ssid, password)) {
     log_e("Soft AP creation failed.");
-    while (1);
+    while (1)
+      ;
   }
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -60,117 +61,169 @@ void loop() {
   NetworkClient client = server.accept();  // listen for incoming clients
 
   if (client) {                     // if you get a client,
+        String req = "";
     Serial.println("New Client.");  // print a message out the serial port
     String currentLine = "";        // make a String to hold incoming data from the client
     while (client.connected()) {    // loop while the client's connected
       if (client.available()) {     // if there's bytes to read from the client,
-        char c = client.read();     // read a byte, then
-        Serial.write(c);            // print it out the serial monitor
-        if (c == '\n') {            // if the byte is a newline character
-
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println();
-
-            const char htmlResponse[] PROGMEM = R"html(
-              <!DOCTYPE html>
-              <html>
-
-              <head>
-                  <title>LED Control</title>
-                  <style>
-                      body {
-                          background-color: #050505;
-                          color: white;
-                          font-size: 22px;
-                      }
-
-                      button {
-                          padding: 8px 16px;
-                          margin: 4px;
-                          font-size: 16px;
-                          font-weight: bold;
-                          cursor: pointer;
-                          border: none;
-                          border-radius: 4px;
-                      }
-
-                      .on {
-                          background-color: #0CFF27;
-                          color: white;
-                      }
-
-                      .off {
-                          background-color: #FF290D;
-                          color: white;
-                      }
-                  </style>
-              </head>
-
-              <body>
-                  <h1>LED Control Panel</h1>
-                  <p>
-                      <span style="color: red; font-weight: bold;">RED LED</span>
-                      <button class="on" onclick="location.href='/RO'">ON</button>
-                      <button class="off" onclick="location.href='/RF'">OFF</button>
-                  </p>
-                  <p>
-                      <span style="color: green; font-weight: bold;">GREEN LED</span>
-                      <button class="on" onclick="location.href='/GO'">ON</button>
-                      <button class="off" onclick="location.href='/GF'">OFF</button>
-                  </p>
-                  <p>
-                      <span style="color: blue; font-weight: bold;">BLUE LED</span>
-                      <button class="on" onclick="location.href='/BO'">ON</button>
-                      <button class="off" onclick="location.href='/BF'">OFF</button>
-                  </p>
-              </body>
-
-              </html>
-            )html";
-            
-            client.print(htmlResponse);
-
-            // The HTTP response ends with another blank line:
-            client.println();
-            // break out of the while loop:
-            break;
-          } else {  // if you got a newline, then clear currentLine:
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }
-
-        // Check to see if the client request was "GET /*" or "GET /*":
-        // inverted logic for RGB LEDs on CYD
-        if (currentLine.endsWith("GET /RF")) {
-          digitalWrite(RED_LED, HIGH);
-        }
-        if (currentLine.endsWith("GET /RO")) {
-          digitalWrite(RED_LED, LOW);
-        }
-        if (currentLine.endsWith("GET /GF")) {
-          digitalWrite(GREEN_LED, HIGH);
-        }
-        if (currentLine.endsWith("GET /GO")) {
-          digitalWrite(GREEN_LED, LOW);
-        }
-        if (currentLine.endsWith("GET /BF")) {
-          digitalWrite(BLUE_LED, HIGH);
-        }
-        if (currentLine.endsWith("GET /BO")) {
-          digitalWrite(BLUE_LED, LOW);
-        }
+        char c = client.read();
+                req += c;
+                if (c == '\n') {
+                    if (req.indexOf("GET / ") >= 0 || req.indexOf("GET /index.html") >= 0) {
+                        serveHTML(client);
+                    } else if (req.indexOf("GET /RO") >= 0) {
+                        handleToggle(client, 'R', true);
+                    } else if (req.indexOf("GET /RF") >= 0) {
+                        handleToggle(client, 'R', false);
+                    } else if (req.indexOf("GET /GO") >= 0) {
+                        handleToggle(client, 'G', true);
+                    } else if (req.indexOf("GET /GF") >= 0) {
+                        handleToggle(client, 'G', false);
+                    } else if (req.indexOf("GET /BO") >= 0) {
+                        handleToggle(client, 'B', true);
+                    } else if (req.indexOf("GET /BF") >= 0) {
+                        handleToggle(client, 'B', false);
+                    }
+                    break;
+                }
       }
     }
     // close the connection:
     client.stop();
     Serial.println("Client Disconnected.");
   }
+}
+
+const char htmlResponse[] PROGMEM = R"html(
+  <!DOCTYPE html>
+  <html>
+            
+  <head>
+      <title>LED Control</title>
+      <style>
+          body {
+              background-color: #050505;
+              color: white;
+              font-size: 22px;
+          }
+            
+          .switch {
+              position: relative;
+              display: inline-block;
+              width: 50px;
+              height: 28px;
+          }
+            
+          .switch input {
+              opacity: 0;
+              width: 0;
+              height: 0;
+          }
+            
+          .slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: #888888;
+              transition: .4s;
+              border-radius: 28px;
+          }
+            
+          .slider:before {
+              position: absolute;
+              content: "";
+              height: 22px;
+              width: 22px;
+              left: 3px;
+              bottom: 3px;
+              background-color: white;
+              transition: .4s;
+              border-radius: 50%;
+          }
+            
+  #red-led-toggle:checked+.slider {
+              background-color: red;
+          }
+            
+  #green-led-toggle:checked+.slider {
+              background-color: green;
+          }
+            
+  #blue-led-toggle:checked+.slider {
+              background-color: blue;
+          }
+            
+          input:checked+.slider:before {
+              transform: translateX(22px);
+          }
+      </style>
+  </head>
+            
+  <body>
+      <h1>LED Control Panel</h1>
+      <!-- Example toggle switch for RED LED -->
+      <p>
+          <span style="color: red; font-weight: bold;">RED LED</span>
+          <label class="switch">
+              <input type="checkbox" id="red-led-toggle" onchange="toggleLED('R', this.checked)">
+              <span class="slider"></span>
+          </label>
+      </p>
+      <p>
+      <span style="color: green; font-weight: bold;">GREEN LED</span>
+      <label class="switch">
+          <input type="checkbox" id="green-led-toggle" onchange="toggleLED('G', this.checked)">
+          <span class="slider"></span>
+      </label>
+      </p>
+      <p>
+      <span style="color: blue; font-weight: bold;">BLUE LED</span>
+      <label class="switch">
+          <input type="checkbox" id="blue-led-toggle" onchange="toggleLED('B', this.checked)">
+          <span class="slider"></span>
+      </label>
+      </p>
+            
+      <script>
+          function toggleLED(color, state) {
+              // color: 'R', 'G', 'B'
+              // state: true (ON), false (OFF)
+              var url = '/' + color + (state ? 'O' : 'F');
+              fetch(url)
+          }
+      </script>
+  </body>
+                        
+              </html>
+            )html";
+
+// Handle LED toggle and send minimal response
+void handleToggle(NetworkClient &client, char color, bool on) {
+  int pin;
+  if (color == 'R') pin = RED_LED;
+  else if (color == 'G') pin = GREEN_LED;
+  else if (color == 'B') pin = BLUE_LED;
+  else return;
+
+  digitalWrite(pin, on ? LOW : HIGH);
+
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-type:text/plain");
+  client.println();
+  client.print(color == 'R' ? "RED " : color == 'G' ? "GREEN "
+                                                    : "BLUE ");
+  client.print(on ? "ON" : "OFF");
+  client.println();
+}
+
+// Serve the HTML page
+void serveHTML(NetworkClient &client) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-type:text/html");
+  client.println();
+  client.print(htmlResponse);
+  client.println();
 }
